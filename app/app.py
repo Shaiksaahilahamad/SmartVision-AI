@@ -449,87 +449,51 @@ elif page == "📊 Performance":
     st.pyplot(fig)
 
 # ---------------- WEBCAM ----------------
+# ---------------- WEBCAM ----------------
 elif page == "📷 Webcam":
 
-    st.title("📷 Real-Time YOLOv8 Detection")
+    st.title("📷 Webcam Detection")
 
-    run = st.button("▶ Start Webcam")
+    st.warning(
+        "⚠ Webcam may not work on Hugging Face Spaces on some browsers."
+    )
 
-    if run:
+    camera_image = st.camera_input("Take a Picture")
 
-        cap = cv2.VideoCapture(0)
+    if camera_image is not None:
 
-        frame_placeholder = st.empty()
+        file_bytes = camera_image.getvalue()
 
-        while cap.isOpened():
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=".jpg"
+        ) as temp_file:
 
-            ret, frame = cap.read()
+            temp_file.write(file_bytes)
 
-            if not ret:
-                st.error("❌ Camera not detected")
-                break
+            temp_path = temp_file.name
 
-            start = time.time()
+        st.image(camera_image, caption="Captured Image")
 
-            results = yolo_model(frame)
+        with st.spinner("🔍 Detecting objects..."):
+
+            results = yolo_model(temp_path)
 
             result = results[0]
 
-            annotated = frame.copy()
+            output = result.plot()
 
-            if result.boxes is not None:
+        st.image(
+            output,
+            channels="BGR",
+            caption="YOLOv8 Detection"
+        )
 
-                for box in result.boxes:
+        if result.boxes is not None:
 
-                    x1, y1, x2, y2 = map(
-                        int,
-                        box.xyxy[0]
-                    )
-
-                    conf = float(box.conf[0])
-
-                    cls = int(box.cls[0])
-
-                    label = yolo_model.names[cls]
-
-                    cv2.rectangle(
-                        annotated,
-                        (x1,y1),
-                        (x2,y2),
-                        (0,255,255),
-                        2
-                    )
-
-                    cv2.putText(
-                        annotated,
-                        f"{label} {conf:.2f}",
-                        (x1, y1-10),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.6,
-                        (0,255,0),
-                        2
-                    )
-
-            end = time.time()
-
-            fps = 1 / (end - start)
-
-            cv2.putText(
-                annotated,
-                f"FPS: {int(fps)}",
-                (20,40),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (255,0,0),
-                2
+            st.success(
+                f"✅ Objects Detected: {len(result.boxes)}"
             )
-
-            frame_placeholder.image(
-                annotated,
-                channels="BGR"
-            )
-
-        cap.release()
 
 # ---------------- ABOUT ----------------
 elif page == "ℹ️ About":
