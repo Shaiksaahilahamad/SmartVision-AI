@@ -1,6 +1,12 @@
 # SmartVision AI - Intelligent Multi-Class Object Recognition System
 
-## Project Overview
+## Live Demo
+🔗 Hugging Face Deployment:
+https://saahil292-smartvision-ai.hf.space
+
+---
+
+# Project Overview
 SmartVision AI is a Computer Vision and Deep Learning project used for:
 
 - Image Classification
@@ -137,6 +143,9 @@ YOLOv8 is used for:
 
 Deployment Platform:
 Hugging Face Spaces
+
+Deployment Link:
+https://saahil292-smartvision-ai.hf.space
 
 Deployment Steps:
 
